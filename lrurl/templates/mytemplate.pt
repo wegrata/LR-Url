@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" xmlns:tal="http://xml.zope.org/namespaces/tal">
+<head>
+  <title>LR Url</title>          
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css"/>        
+  <!--[if lte IE 6]>
+  <link rel="stylesheet" href="${request.static_url('lrurl:static/ie6.css')}" type="text/css" media="screen" charset="utf-8" />
+  <![endif]-->
+</head>
+<body>
+  <div class="container">
+    <h1>Learning Registry Cannonical URL</h1>
+  </div>
+  <div class="container">
+    <div class="jumbotron">
+      <form id="frm">
+        <input type="text" id="url" name="url"/>
+        <button class="btn btn-primary" type="submit">Find Matches</button>
+      </form>
+    </div>
+  </div>
+  <div class="container">
+    <h2 id="resultHeader" style="display:none"></h2>
+    <ul class="list-group" id="result">      
+    </ul>
+  </div>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>  
+  <script type="text/javascript">
+    $("#frm").on("submit", function(){
+      var url = $("#url").val();      
+      $.post('/url', {url: url}, function(data){
+        var header = $("#resultHeader").css("display", "block");
+        if(data.result.length > 0){
+          header.html("Below are the top " + data.result.length + " matches");
+        }else{
+          header.html("There are no URLs similiar to the one you entered");
+        }
+        var resultContainer = $("#result");        
+        resultContainer.empty();
+        for (var i in data.result){
+          var li = $("<li>");
+          var span = $("<span>").addClass("badge").html("Similarity: " + data.result[i].rank);
+          li.addClass("list-group-item");
+          li.append(data.result[i].url).append(span);
+          resultContainer.append(li);
+        }
+      });
+      return false;
+    });
+  </script>
+</body>
+</html>
